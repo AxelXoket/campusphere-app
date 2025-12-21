@@ -1,17 +1,49 @@
 @import "tailwindcss";
 
+/* ============================================
+   CampuSphere Design System - "Academic Heritage"
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --bosphorus-emerald: #004D40;
+  --bosphorus-emerald-light: #00695C;
+  --bosphorus-emerald-glow: rgba(0, 77, 64, 0.4);
+  --warm-gold: #FFD700;
+  --warm-gold-muted: #DAA520;
+  --paper-white: #F5F5F7;
+  
+  /* Semantic Colors */
+  --background: var(--paper-white);
+  --foreground: #1a1a1a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --input-border: #d1d5db;
+  
+  /* Feedback Colors */
+  --success: #10b981;
+  --error: #ef4444;
 }
 
+/* Tailwind v4 Theme Configuration */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  
+  /* Brand palette */
+  --color-emerald-brand: var(--bosphorus-emerald);
+  --color-emerald-light: var(--bosphorus-emerald-light);
+  --color-gold-brand: var(--warm-gold);
+  --color-gold-muted: var(--warm-gold-muted);
+  --color-paper: var(--paper-white);
+  
+  /* Font families */
+  --font-heading: "DM Serif Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
 }
 
+/* Dark mode (for map context later) */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +51,101 @@
   }
 }
 
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading Typography */
+h1, h2, h3, .heading {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--bosphorus-emerald);
+  outline-offset: 2px;
+}
+
+/* Underline Input Base */
+.input-underline {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--input-border);
+  padding: 0.75rem 0;
+  width: 100%;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.input-underline:focus {
+  outline: none;
+  border-bottom-color: var(--bosphorus-emerald);
+}
+
+.input-underline::placeholder {
+  color: var(--muted);
+}
+
+/* Button Primary */
+.btn-primary {
+  background: var(--bosphorus-emerald);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: var(--bosphorus-emerald-light);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* File Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--input-border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  border-color: var(--bosphorus-emerald);
+  background: rgba(0, 77, 64, 0.02);
+}
+
+.upload-zone.active {
+  border-color: var(--bosphorus-emerald);
+  background: rgba(0, 77, 64, 0.05);
+}
+
+.upload-zone.success {
+  border-color: var(--success);
+  border-style: solid;
+  background: rgba(16, 185, 129, 0.05);
 }
