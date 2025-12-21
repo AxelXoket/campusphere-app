@@ -12,14 +12,14 @@
   --warm-gold: #FFD700;
   --warm-gold-muted: #DAA520;
   --paper-white: #F5F5F7;
-  
+
   /* Semantic Colors */
   --background: var(--paper-white);
   --foreground: #1a1a1a;
   --muted: #6b7280;
   --border: #e5e7eb;
   --input-border: #d1d5db;
-  
+
   /* Feedback Colors */
   --success: #10b981;
   --error: #ef4444;
@@ -30,14 +30,14 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
-  
+
   /* Brand palette */
   --color-emerald-brand: var(--bosphorus-emerald);
   --color-emerald-light: var(--bosphorus-emerald-light);
   --color-gold-brand: var(--warm-gold);
   --color-gold-muted: var(--warm-gold-muted);
   --color-paper: var(--paper-white);
-  
+
   /* Font families */
   --font-heading: "DM Serif Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
@@ -65,7 +65,10 @@ body {
 }
 
 /* Heading Typography */
-h1, h2, h3, .heading {
+h1,
+h2,
+h3,
+.heading {
   font-family: var(--font-heading);
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -85,6 +88,8 @@ h1, h2, h3, .heading {
   padding: 0.75rem 0;
   width: 100%;
   font-size: 1rem;
+  color: #1a1a1a;
+  /* Solid black for legibility */
   transition: border-color 0.2s ease;
 }
 
@@ -124,28 +129,24 @@ h1, h2, h3, .heading {
   cursor: not-allowed;
 }
 
-/* File Upload Zone */
-.upload-zone {
-  border: 2px dashed var(--input-border);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-  cursor: pointer;
+/* ============================================
+   SVG Marching Ants Animation (60fps GPU-accelerated)
+   Uses stroke-dashoffset for smooth, uniform animation
+   ============================================ */
+
+@keyframes marching-ants {
+  0% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -16;
+    /* Negative for clockwise motion */
+  }
 }
 
-.upload-zone:hover {
-  border-color: var(--bosphorus-emerald);
-  background: rgba(0, 77, 64, 0.02);
-}
-
-.upload-zone.active {
-  border-color: var(--bosphorus-emerald);
-  background: rgba(0, 77, 64, 0.05);
-}
-
-.upload-zone.success {
-  border-color: var(--success);
-  border-style: solid;
-  background: rgba(16, 185, 129, 0.05);
+.animate-marching-ants {
+  animation: marching-ants 0.5s linear infinite;
+  /* GPU acceleration hint */
+  will-change: stroke-dashoffset;
 }

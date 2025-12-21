@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { MapView } from "@/components/map";
 import {
     SearchBar,
@@ -11,7 +11,10 @@ import {
     EventBottomSheet,
     UserBottomSheet,
     FilterOverlay,
-    LayersOverlay
+    LayersOverlay,
+    VerificationOverlay,
+    CalendarDropdown,
+    AnnouncementsPanel
 } from "@/components/hud";
 import { mockEvents, MockEvent } from "@/data/mockEvents";
 import { mockUsers, MockUser } from "@/data/mockUsers";
@@ -43,6 +46,8 @@ export default function MapPage() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isLayersOpen, setIsLayersOpen] = useState(false);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [isAnnouncementsOpen, setIsAnnouncementsOpen] = useState(false);
 
     // Event Sheet
     const [selectedEvent, setSelectedEvent] = useState<MockEvent | null>(null);
@@ -54,6 +59,29 @@ export default function MapPage() {
 
     // Ghost Mode
     const [isGhostMode, setIsGhostMode] = useState(false);
+
+    // Verification state (loaded from localStorage for demo)
+    const [isVerified, setIsVerified] = useState(true);
+    const [verificationOverlayOpen, setVerificationOverlayOpen] = useState(false);
+    const [restrictedFeature, setRestrictedFeature] = useState<string | undefined>();
+
+    // Load verification status from localStorage on mount
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const stored = localStorage.getItem("isVerified");
+            setIsVerified(stored !== "false");
+        }
+    }, []);
+
+    // Handle restricted feature access
+    const handleRestrictedAction = useCallback((featureName: string) => {
+        if (!isVerified) {
+            setRestrictedFeature(featureName);
+            setVerificationOverlayOpen(true);
+            return false;
+        }
+        return true;
+    }, [isVerified]);
 
     // Filters - all enabled by default
     const [filters, setFilters] = useState<Record<RoleType, boolean>>({
@@ -108,7 +136,26 @@ export default function MapPage() {
             />
 
             {/* HUD Overlay */}
-            <SearchBar />
+            <SearchBar
+                onCalendarClick={() => setIsCalendarOpen(true)}
+                onAnnouncementsClick={() => setIsAnnouncementsOpen(true)}
+            />
+
+            {/* Calendar Dropdown */}
+            <CalendarDropdown
+                isOpen={isCalendarOpen}
+                onClose={() => setIsCalendarOpen(false)}
+                onEventClick={(event) => {
+                    setSelectedEvent(event);
+                    setIsEventSheetOpen(true);
+                }}
+            />
+
+            {/* Announcements Panel */}
+            <AnnouncementsPanel
+                isOpen={isAnnouncementsOpen}
+                onClose={() => setIsAnnouncementsOpen(false)}
+            />
 
             {/* Left Panel - Chat & Events */}
             <LeftPanel
@@ -175,6 +222,13 @@ export default function MapPage() {
                 user={selectedUser}
                 isOpen={isUserSheetOpen}
                 onClose={() => setIsUserSheetOpen(false)}
+            />
+
+            {/* Verification Overlay for restricted features */}
+            <VerificationOverlay
+                isOpen={verificationOverlayOpen}
+                onClose={() => setVerificationOverlayOpen(false)}
+                featureName={restrictedFeature}
             />
         </main>
     );
