@@ -13,17 +13,26 @@ export interface MockEvent {
     imageUrl?: string;
 }
 
-// 3 mock events across Istanbul (Gold markers)
+/**
+ * Generate dynamic dates relative to today for calendar integration
+ */
+function getRelativeDate(daysFromNow: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    return date.toISOString().split("T")[0];
+}
+
+// Mock events with dynamic dates for calendar view
 export const mockEvents: MockEvent[] = [
     {
         id: "event-1",
-        title: "Mezunlar Buluşması 2025",
+        title: "Mezunlar Buluşması",
         description: "İstanbul Üniversitesi mezunları için yıllık networking etkinliği.",
-        date: "2025-01-15",
+        date: getRelativeDate(0), // Today
         time: "19:00",
         location: "Beyazıt Kampüsü, Rektörlük Binası",
         latitude: 41.0155,
-        longitude: 28.9650,
+        longitude: 28.965,
         organizer: "İÜ Mezunlar Derneği",
         organizerRole: "mezun",
         attendeeCount: 150,
@@ -33,7 +42,7 @@ export const mockEvents: MockEvent[] = [
         id: "event-2",
         title: "Yapay Zeka Semineri",
         description: "Akademik çalışmalar ve endüstri uygulamaları üzerine panel.",
-        date: "2025-01-20",
+        date: getRelativeDate(2), // 2 days from now
         time: "14:00",
         location: "Avcılar Kampüsü, Konferans Salonu",
         latitude: 40.9892,
@@ -47,11 +56,11 @@ export const mockEvents: MockEvent[] = [
         id: "event-3",
         title: "Kariyer Günleri",
         description: "Öğrenciler ve mezunlar için iş fırsatları ve staj olanakları.",
-        date: "2025-02-05",
+        date: getRelativeDate(4), // 4 days from now
         time: "10:00",
         location: "İşletme Fakültesi",
         latitude: 41.0186,
-        longitude: 28.9520,
+        longitude: 28.952,
         organizer: "Kariyer Merkezi",
         organizerRole: "akademisyen",
         attendeeCount: 300,
