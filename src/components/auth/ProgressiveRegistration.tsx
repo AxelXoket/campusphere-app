@@ -329,37 +329,50 @@ function Step2Form({
                         setFaculty(e.target.value);
                         setDepartment(""); // Reset department when faculty changes
                     }}
-                    className="input-underline text-[#1a1a1a] bg-transparent cursor-pointer"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-[#1a1a1a] text-sm cursor-pointer transition-all duration-200 focus:border-[var(--bosphorus-emerald)] focus:ring-2 focus:ring-[var(--bosphorus-emerald)]/20 focus:outline-none hover:border-[var(--bosphorus-emerald)]/50"
                     required
                 >
                     <option value="">Fakülte seçiniz...</option>
                     {faculties.map((f) => (
-                        <option key={f.id} value={f.id}>
-                            {f.name}
+                        <option key={f} value={f}>
+                            {f}
                         </option>
                     ))}
                 </select>
             </div>
 
             {/* Department Dropdown */}
-            <div className="space-y-1">
+            <div className="space-y-1 relative">
                 <label className="block text-sm font-medium text-[var(--muted)]">
                     Bölüm
                 </label>
-                <select
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="input-underline text-[#1a1a1a] bg-transparent cursor-pointer"
-                    disabled={!faculty}
-                    required
-                >
-                    <option value="">Bölüm seçiniz...</option>
-                    {availableDepartments.map((d) => (
-                        <option key={d} value={d}>
-                            {d}
+                <div className="relative">
+                    <select
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                        className={`w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200 focus:outline-none ${!faculty
+                                ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "border-gray-200 bg-white/80 backdrop-blur-sm text-[#1a1a1a] cursor-pointer hover:border-[var(--bosphorus-emerald)]/50 focus:border-[var(--bosphorus-emerald)] focus:ring-2 focus:ring-[var(--bosphorus-emerald)]/20"
+                            }`}
+                        disabled={!faculty}
+                        required
+                    >
+                        <option value="">
+                            {!faculty ? "Önce fakülte seçiniz..." : "Bölüm seçiniz..."}
                         </option>
-                    ))}
-                </select>
+                        {availableDepartments.map((d) => (
+                            <option key={d} value={d}>
+                                {d}
+                            </option>
+                        ))}
+                    </select>
+                    {/* Disabled state tooltip */}
+                    {!faculty && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                            ⚠
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* File Upload */}
