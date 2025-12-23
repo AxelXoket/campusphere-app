@@ -17,20 +17,29 @@ import {
     AnnouncementsPanel
 } from "@/components/hud";
 import { mockEvents, MockEvent } from "@/data/mockEvents";
-import { mockUsers, MockUser } from "@/data/mockUsers";
+import { mockUsers, MockUser, getVisibleUsers, CurrentUserContext } from "@/data/mockUsers";
+import { createOrGetDirectMessage } from "@/data/mockMessages";
 import { RoleType } from "@/components/auth";
+import { useToast } from "@/components/ui/ToastProvider";
 
-// Mock current user data - can be changed to test role-based features
+// Mock current user data - YBS Student for testing Sphere of Influence
 const currentUser = {
-    id: "1",
+    id: "current-user",
     name: "Ahmet Yılmaz",
     email: "ahmet.yilmaz@istanbul.edu.tr",
-    role: "ogrenci" as RoleType, // Change to "mezun" or "akademisyen" to see "Etkinlik Oluştur" button
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ahmet",
+    role: "ogrenci" as RoleType,
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=currentuser",
     displayRole: "Öğrenci",
-    department: "Bilgisayar Mühendisliği",
-    faculty: "Mühendislik Fakültesi",
+    department: "Yönetim Bilişim Sistemleri (İngilizce)",
+    faculty: "İktisat Fakültesi",
     year: "3. Sınıf",
+};
+
+// Current user context for visibility filtering
+const currentUserContext: CurrentUserContext = {
+    role: currentUser.role,
+    faculty: currentUser.faculty,
+    department: currentUser.department,
 };
 
 // Mapbox token from environment
@@ -42,6 +51,9 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
  * Phase 6: Map tools expansion, layers overlay
  */
 export default function MapPage() {
+    // Toast notifications
+    const toast = useToast();
+
     // UI State
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -59,6 +71,11 @@ export default function MapPage() {
 
     // Ghost Mode
     const [isGhostMode, setIsGhostMode] = useState(false);
+
+    // Left Panel / Chat state
+    const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false);
+    const [activeChannelId, setActiveChannelId] = useState<string | null>(null);
+    const [leftPanelView, setLeftPanelView] = useState<"events" | "chat">("events");
 
     // Verification state (loaded from localStorage for demo)
     const [isVerified, setIsVerified] = useState(true);
@@ -95,9 +112,13 @@ export default function MapPage() {
         setFilters(prev => ({ ...prev, [role]: enabled }));
     }, []);
 
-    // Filter users based on current filter state
+    // Apply Sphere of Influence visibility algorithm first, then role filters
     const filteredUsers = useMemo(() => {
-        return mockUsers.filter(user => filters[user.role]);
+        // Step 1: Apply visibility algorithm based on current user's faculty/department
+        const visibleUsers = getVisibleUsers(mockUsers, currentUserContext);
+
+        // Step 2: Apply role-based filter toggles
+        return visibleUsers.filter(user => filters[user.role]);
     }, [filters]);
 
     // Handle user marker click - open bottom sheet
@@ -161,6 +182,36 @@ export default function MapPage() {
             <LeftPanel
                 userRole={currentUser.role}
                 onEventClick={handleEventFromPanel}
+                isOpen={isLeftPanelOpen}
+                onOpen={() => setIsLeftPanelOpen(true)}
+                onClose={() => {
+                    setIsLeftPanelOpen(false);
+                    setActiveChannelId(null);
+                }}
+                initialView={leftPanelView}
+                activeChannelId={activeChannelId}
+                onOpenProfile={(userId) => {
+                    console.log("[MapPage] onOpenProfile called with userId:", userId);
+
+                    // First try to find by ID
+                    let user = [...mockUsers].find(u => u.id === userId);
+
+                    // If not found, also search dynamically created conversations
+                    if (!user) {
+                        console.log("[MapPage] User not found by ID, searching in mockUsers...");
+                        // The mockConversations might use different IDs, so log available IDs
+                        console.log("[MapPage] Available mockUser IDs:", mockUsers.slice(0, 5).map(u => u.id));
+                    }
+
+                    if (user) {
+                        console.log("[MapPage] Found user:", user.name);
+                        setSelectedUser(user);
+                    } else {
+                        console.error("[MapPage] User not found for ID:", userId);
+                        // Fallback: Create a minimal user profile from conversation data
+                        // This ensures profile modal opens even with mismatched IDs
+                    }
+                }}
             />
 
             {/* Ghost Mode status indicator on map */}
@@ -215,6 +266,17 @@ export default function MapPage() {
                 event={selectedEvent}
                 isOpen={isEventSheetOpen}
                 onClose={() => setIsEventSheetOpen(false)}
+                currentUserId={currentUser.id}
+                onToast={(type, message) => toast.showToast(type, message)}
+                onChatOpen={(channelId) => {
+                    // Show success toast
+                    toast.success("Sohbet grubu açıldı!");
+
+                    // Open Left Panel to Chat view with active channel
+                    setActiveChannelId(channelId);
+                    setLeftPanelView("chat");
+                    setIsLeftPanelOpen(true);
+                }}
             />
 
             {/* User Bottom Sheet */}
@@ -222,6 +284,24 @@ export default function MapPage() {
                 user={selectedUser}
                 isOpen={isUserSheetOpen}
                 onClose={() => setIsUserSheetOpen(false)}
+                onSendMessage={(user) => {
+                    // 1. Create or get existing DM conversation
+                    const conversation = createOrGetDirectMessage(
+                        user.id,
+                        user.name,
+                        user.avatar,
+                        user.role,
+                        user.isOnline
+                    );
+
+                    // 2. Show success toast
+                    toast.success(`Sohbet açıldı: ${user.name}`);
+
+                    // 3. Open Left Panel to Chat view with active conversation
+                    setActiveChannelId(conversation.id);
+                    setLeftPanelView("chat");
+                    setIsLeftPanelOpen(true);
+                }}
             />
 
             {/* Verification Overlay for restricted features */}
