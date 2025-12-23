@@ -26,11 +26,11 @@ export interface MockConversation {
     eventId?: string; // Link to event if group chat
 }
 
-// Direct message conversations
+// Direct message conversations - IDs match mockUsers
 export const mockConversations: MockConversation[] = [
     {
         id: "conv-1",
-        participantId: "2",
+        participantId: "science-1", // Matches mockUsers science-1 (akademisyen)
         participantName: "Zeynep Kaya",
         participantAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep",
         participantRole: "akademisyen",
@@ -41,7 +41,7 @@ export const mockConversations: MockConversation[] = [
     },
     {
         id: "conv-2",
-        participantId: "3",
+        participantId: "graduate-1", // Matches mockUsers graduate-1 (mezun)
         participantName: "Mehmet Demir",
         participantAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=mehmet",
         participantRole: "mezun",
@@ -52,7 +52,7 @@ export const mockConversations: MockConversation[] = [
     },
     {
         id: "conv-3",
-        participantId: "4",
+        participantId: "ybs-1", // Matches mockUsers ybs-1 (ogrenci)
         participantName: "Elif Şahin",
         participantAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=elif",
         participantRole: "ogrenci",
@@ -63,7 +63,7 @@ export const mockConversations: MockConversation[] = [
     },
     {
         id: "conv-4",
-        participantId: "5",
+        participantId: "science-2", // Matches mockUsers science-2 (akademisyen)
         participantName: "Prof. Dr. Ali Özkan",
         participantAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ali",
         participantRole: "akademisyen",
@@ -74,7 +74,7 @@ export const mockConversations: MockConversation[] = [
     },
     {
         id: "conv-5",
-        participantId: "6",
+        participantId: "graduate-2", // Matches mockUsers graduate-2 (mezun)
         participantName: "Fatma Arslan",
         participantAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=fatma",
         participantRole: "mezun",

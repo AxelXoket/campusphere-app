@@ -9,7 +9,7 @@ type AuthMode = "login" | "register";
 
 /**
  * The Gate - CampuSphere Authentication Page
- * Supports both Login and Progressive Registration flows
+ * Cinematic video background with glassmorphism auth card
  */
 export default function HomePage() {
   const router = useRouter();
@@ -17,7 +17,6 @@ export default function HomePage() {
 
   const handleRegistrationComplete = (data: { isVerified: boolean }) => {
     console.log("Registration complete:", data);
-    // Store verification status (in real app, would use context/state management)
     if (typeof window !== "undefined") {
       localStorage.setItem("isVerified", String(data.isVerified));
     }
@@ -31,7 +30,6 @@ export default function HomePage() {
 
   const handleLogin = (data: { email: string; password: string }) => {
     console.log("Login:", data);
-    // In real app, would verify and get isVerified status from backend
     if (typeof window !== "undefined") {
       localStorage.setItem("isVerified", "true");
     }
@@ -39,97 +37,128 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[var(--paper)] flex items-center justify-center p-4">
-      {/* Auth Card Container */}
-      <div className="w-full max-w-md">
-        {/* Logo/Branding Section */}
-        <div className="text-center mb-10">
-          <h1
-            className="text-4xl font-normal text-[var(--bosphorus-emerald)] mb-2"
-            style={{ fontFamily: "var(--font-heading)" }}
+    <main className="min-h-screen relative overflow-hidden">
+      {/* Cinematic Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed inset-0 w-full h-full object-cover z-[-2]"
+      >
+        <source src="/videos/cs_bg.mp4" type="video/mp4" />
+      </video>
+
+      {/* Dark Overlay for Readability */}
+      <div className="fixed inset-0 bg-black/60 z-[-1]" />
+
+      {/* Content Container */}
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <div className="w-full max-w-md">
+          {/* Logo/Branding Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10"
           >
-            CampuSphere
-          </h1>
-          <p className="text-[var(--muted)] text-sm">
-            İstanbul Üniversitesi Dijital Kampüs Ağı
-          </p>
-        </div>
-
-        {/* Auth Card */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-black/5 p-8">
-          {/* Mode Tabs */}
-          <div className="flex mb-6 p-1 bg-gray-100 rounded-xl">
-            <button
-              onClick={() => setMode("login")}
-              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${mode === "login"
-                  ? "bg-white text-[var(--bosphorus-emerald)] shadow-sm"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)]"
-                }`}
-            >
-              Giriş Yap
-            </button>
-            <button
-              onClick={() => setMode("register")}
-              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${mode === "register"
-                  ? "bg-white text-[var(--bosphorus-emerald)] shadow-sm"
-                  : "text-[var(--muted)] hover:text-[var(--foreground)]"
-                }`}
-            >
-              Kayıt Ol
-            </button>
-          </div>
-
-          {/* Dynamic Heading */}
-          <AnimatePresence mode="wait">
-            <motion.h2
-              key={mode}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.2 }}
-              className="text-2xl text-center text-[#1a1a1a] mb-6"
+            <h1
+              className="text-5xl font-normal text-white mb-3 drop-shadow-lg"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              {mode === "login" ? "Hoş Geldiniz" : "Hızlı Kayıt"}
-            </motion.h2>
-          </AnimatePresence>
+              CampuSphere
+            </h1>
+            <p className="text-white/70 text-sm tracking-wide">
+              İstanbul Üniversitesi Dijital Kampüs Ağı
+            </p>
+          </motion.div>
 
-          {/* Form Content */}
-          <AnimatePresence mode="wait">
-            {mode === "login" ? (
-              <motion.div
-                key="login"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
+          {/* Glassmorphism Auth Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="backdrop-blur-xl bg-black/40 border border-white/10 rounded-3xl shadow-2xl p-8"
+          >
+            {/* Mode Tabs - Dark Theme */}
+            <div className="flex mb-6 p-1 bg-white/10 rounded-xl">
+              <button
+                onClick={() => setMode("login")}
+                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${mode === "login"
+                    ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                  }`}
               >
-                <AuthForm
-                  onLogin={handleLogin}
-                  onViewChange={() => { }}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="register"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                Giriş Yap
+              </button>
+              <button
+                onClick={() => setMode("register")}
+                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${mode === "register"
+                    ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                  }`}
               >
-                <ProgressiveRegistration
-                  onComplete={handleRegistrationComplete}
-                  onSkip={handleSkip}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+                Kayıt Ol
+              </button>
+            </div>
+
+            {/* Dynamic Heading - White for dark bg */}
+            <AnimatePresence mode="wait">
+              <motion.h2
+                key={mode}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+                className="text-2xl text-center text-white mb-6"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                {mode === "login" ? "Hoş Geldiniz" : "Hızlı Kayıt"}
+              </motion.h2>
+            </AnimatePresence>
+
+            {/* Form Content */}
+            <AnimatePresence mode="wait">
+              {mode === "login" ? (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AuthForm
+                    onLogin={handleLogin}
+                    onViewChange={() => { }}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="register"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ProgressiveRegistration
+                    onComplete={handleRegistrationComplete}
+                    onSkip={handleSkip}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Footer - Light text for dark bg */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-center text-xs text-white/40 mt-6"
+          >
+            © 2025 CampuSphere. Tüm hakları saklıdır.
+          </motion.p>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-[var(--muted)] mt-6">
-          © 2025 CampuSphere. Tüm hakları saklıdır.
-        </p>
       </div>
     </main>
   );
