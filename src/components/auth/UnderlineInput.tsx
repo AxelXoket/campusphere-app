@@ -21,7 +21,7 @@ export const UnderlineInput = forwardRef<HTMLInputElement, UnderlineInputProps>(
                 {label && (
                     <label
                         htmlFor={inputId}
-                        className="block text-sm font-medium text-[var(--muted)]"
+                        className="block text-sm font-medium text-white"
                     >
                         {label}
                     </label>

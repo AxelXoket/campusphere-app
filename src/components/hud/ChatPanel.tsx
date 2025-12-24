@@ -584,7 +584,13 @@ function ChatDetail({
         setIsTyping(true);
 
         try {
-            // Call AI API
+            // Build chat history for context (last 8 messages)
+            const chatHistory = liveMessages.slice(-8).map(msg => ({
+                role: msg.isMe ? "user" as const : "assistant" as const,
+                content: msg.content,
+            }));
+
+            // Call AI API with history context
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -595,6 +601,7 @@ function ChatDetail({
                         role: conversation.participantRole,
                         department: undefined,
                     },
+                    history: chatHistory,
                 }),
             });
 

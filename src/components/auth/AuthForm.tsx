@@ -86,7 +86,7 @@ function LoginView({
         >
             {/* Role Selection */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Hesap Türü
                 </label>
                 <SegmentedControl value={role} onChange={setRole} />
@@ -111,13 +111,21 @@ function LoginView({
                 required
             />
 
-            {/* Remember Me Checkbox */}
-            <Checkbox
-                id="remember-me"
-                label="Beni Hatırla"
-                checked={rememberMe}
-                onChange={setRememberMe}
-            />
+            {/* Remember Me & Forgot Password Row - Below Password */}
+            <div className="flex justify-between items-center w-full">
+                <Checkbox
+                    id="remember-me"
+                    label="Beni Hatırla"
+                    checked={rememberMe}
+                    onChange={setRememberMe}
+                />
+                <a
+                    href="#"
+                    className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                    Şifremi Unuttum
+                </a>
+            </div>
 
             {/* Submit Button */}
             <motion.button
@@ -139,26 +147,6 @@ function LoginView({
                     "Giriş Yap"
                 )}
             </motion.button>
-
-            {/* Footer Links */}
-            <div className="text-center space-y-2">
-                <p className="text-sm text-[var(--muted)]">
-                    Hesabın yok mu?{" "}
-                    <button
-                        type="button"
-                        onClick={onSwitchToRegister}
-                        className="text-[var(--bosphorus-emerald)] hover:text-[#00695C] hover:underline font-medium transition-colors duration-200"
-                    >
-                        Kayıt Ol
-                    </button>
-                </p>
-                <a
-                    href="#"
-                    className="inline-block text-sm text-[#9ca3af] hover:text-[#4B5563] transition-colors duration-200"
-                >
-                    Şifremi Unuttum
-                </a>
-            </div>
         </motion.form>
     );
 }
@@ -230,7 +218,7 @@ function RegisterView({
         >
             {/* Role Selection */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Hesap Türü
                 </label>
                 <SegmentedControl value={role} onChange={setRole} />
@@ -247,7 +235,7 @@ function RegisterView({
                     onBlur={handleNameBlur}
                     required
                 />
-                <p className="text-xs text-[var(--muted)] opacity-70 pl-0.5">
+                <p className="text-xs text-white/60 pl-0.5">
                     Lütfen yükleyeceğiniz belgede yer alan ad-soyad bilgilerini eksiksiz giriniz.
                 </p>
             </div>
@@ -285,7 +273,7 @@ function RegisterView({
 
             {/* File Upload - Dynamic label based on selected role */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     {documentLabels[role]}
                 </label>
                 <FileUpload onFileSelect={setFile} />
@@ -312,19 +300,6 @@ function RegisterView({
                 )}
             </motion.button>
 
-            {/* Footer Link */}
-            <div className="text-center">
-                <p className="text-sm text-[var(--muted)]">
-                    Zaten hesabın var mı?{" "}
-                    <button
-                        type="button"
-                        onClick={onSwitchToLogin}
-                        className="text-[var(--bosphorus-emerald)] hover:underline font-medium"
-                    >
-                        Giriş Yap
-                    </button>
-                </p>
-            </div>
         </motion.form>
     );
 }

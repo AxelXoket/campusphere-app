@@ -80,26 +80,26 @@ h3,
   outline-offset: 2px;
 }
 
-/* Underline Input Base */
+/* Underline Input Base - Dark Glassmorphism Theme */
 .input-underline {
-  background: transparent;
-  border: none;
-  border-bottom: 1.5px solid var(--input-border);
-  padding: 0.75rem 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
   width: 100%;
   font-size: 1rem;
-  color: #1a1a1a;
-  /* Solid black for legibility */
-  transition: border-color 0.2s ease;
+  color: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-underline:focus {
   outline: none;
-  border-bottom-color: var(--bosphorus-emerald);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
 }
 
 .input-underline::placeholder {
-  color: var(--muted);
+  color: rgba(156, 163, 175, 0.8);
 }
 
 /* Button Primary */
