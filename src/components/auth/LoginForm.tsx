@@ -48,7 +48,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         >
             {/* Role Selection */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Hesap Türü
                 </label>
                 <SegmentedControl value={role} onChange={setRole} />
@@ -76,7 +76,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
 
             {/* File Upload - Required for all roles */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Kimlik Belgesi ({roleLabels[role]} için)
                 </label>
                 <FileUpload onFileSelect={setFile} />
@@ -103,15 +103,21 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
                 )}
             </motion.button>
 
-            {/* Footer Links */}
-            <div className="text-center space-y-2">
-                <p className="text-sm text-[var(--muted)]">
-                    Hesabın yok mu?{" "}
-                    <a href="#" className="text-[var(--bosphorus-emerald)] hover:underline font-medium">
-                        Kayıt Ol
-                    </a>
-                </p>
-                <a href="#" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)]">
+            {/* Remember Me & Forgot Password Row */}
+            <div className="flex justify-between items-center w-full">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-white/30 bg-white/10 text-indigo-500 focus:ring-indigo-500/30 focus:ring-offset-0 cursor-pointer"
+                    />
+                    <span className="text-sm text-white/70 group-hover:text-white transition-colors">
+                        Beni Hatırla
+                    </span>
+                </label>
+                <a
+                    href="#"
+                    className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
                     Şifremi Unuttum
                 </a>
             </div>

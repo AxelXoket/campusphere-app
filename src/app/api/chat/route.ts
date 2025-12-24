@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // GPT-4o-mini Chat API Route
-// Generates AI responses for campus personas
+// Generates AI responses for campus personas with natural conversation flow
+
+interface ChatMessage {
+    role: "user" | "assistant";
+    content: string;
+}
 
 interface ChatRequest {
     message: string;
@@ -10,6 +15,8 @@ interface ChatRequest {
         role: "ogrenci" | "mezun" | "akademisyen";
         department?: string;
     };
+    // Chat history for context awareness (last 8 messages)
+    history?: ChatMessage[];
 }
 
 // Role labels in Turkish
@@ -23,8 +30,12 @@ export async function POST(request: NextRequest) {
     console.log("[Chat API] Request received");
 
     try {
-        const { message, persona }: ChatRequest = await request.json();
-        console.log("[Chat API] Parsed request:", { message: message?.substring(0, 50), persona: persona?.name });
+        const { message, persona, history = [] }: ChatRequest = await request.json();
+        console.log("[Chat API] Parsed request:", {
+            message: message?.substring(0, 50),
+            persona: persona?.name,
+            historyLength: history?.length || 0
+        });
 
         // Validate input
         if (!message || !persona?.name || !persona?.role) {
@@ -37,8 +48,6 @@ export async function POST(request: NextRequest) {
 
         const apiKey = process.env.OPENAI_API_KEY;
         console.log("[Chat API] API Key exists:", !!apiKey);
-        console.log("[Chat API] API Key length:", apiKey?.length || 0);
-        console.log("[Chat API] API Key prefix:", apiKey?.substring(0, 7) || "NONE");
 
         if (!apiKey) {
             console.error("[Chat API] OPENAI_API_KEY not configured in environment");
@@ -49,81 +58,137 @@ export async function POST(request: NextRequest) {
         }
 
         // =====================================================
-        // STRONG PERSONA SYSTEM PROMPT BUILDER
+        // NATURAL CONVERSATION SYSTEM PROMPT ARCHITECTURE
+        // Designed to prevent persona drift, repetition, and
+        // create human-like Turkish conversation flow
         // =====================================================
         const personaName = persona.name || "Kampüs Üyesi";
         const department = persona.department || "Üniversite";
+        const roleLabel = roleLabels[persona.role] || "öğrenci";
+        const isFirstMessage = history.length === 0;
 
         let systemPrompt: string;
 
+        // Anti-repetition and natural flow constraints for ALL personas
+        const naturalFlowRules = `
+DOĞAL KONUŞMA KURALLARI (ÇOK ÖNEMLİ):
+1. TEKRAR YAPMA: Aynı selamlaşmayı veya kalıbı her mesajda KULLANMA. ${isFirstMessage ? "Bu ilk mesaj, selamlayabilirsin." : "Bu ilk mesaj DEĞİL, selamlama yapma."}
+2. ROBOT GİBİ KONUŞMA: "Size nasıl yardımcı olabilirim?", "Başka sorunuz var mı?", "Evet efendim" gibi müşteri hizmetleri kalıplarını ASLA kullanma.
+3. HATA DURUMU: Eğer kullanıcı bir hatan olduğunu söylerse, insan gibi tepki ver:
+   - Öğrenci: "Ya pardon, kafam başka yerde" veya "Haklısın ya, dalmışım"
+   - Akademisyen: "Kusura bakın, dikkatim dağılmış" veya "Haklısınız, özür dilerim"
+   - Mezun: "Aa doğru, kusura bakma" veya "Haklısın, alışkanlık olmuş"
+4. AÇIK UÇLU BIRAK: Sohbeti doğal şekilde açık bırak, soru sormak zorunda değilsin.
+5. KİMLİK: Sen bir yapay zeka DEĞİLSİN, gerçek bir insansın. Bunu asla bozma.
+
+DİL KURALLARI:
+- KUSURSUZ Türkçe kullan. "de/da", "ki", "mi/mı/mu/mü" eklerine özellikle dikkat et.
+- Yanıtlar 1-3 cümle olsun, doğal ve akıcı.`;
+
         switch (persona.role) {
             case "akademisyen":
-                // PROFESSOR: Formal, instructive, professional
-                systemPrompt = `Sen ${personaName}, İstanbul Üniversitesi ${department} bölümünde akademisyen/profesörsün.
+                // ACADEMICIAN: Formal but NOT robotic
+                systemPrompt = `ROL: Sen ${personaName}. İstanbul Üniversitesi ${department} bölümünde akademisyen/profesörsün.
+MİSYON: CampuSphere kampüs simülasyonunda gerçek bir akademisyen olarak doğal sohbet ediyorsun.
 
-KARAKTER ÖZELLİKLERİ:
-- Resmi ve profesyonel bir dil kullan
-- Bilgili ve öğretici ol
-- Öğrencilere yardımcı olmaya istekli ama mesafeli
-- Akademik terimler kullanabilirsin
-- "Merhaba" yerine "İyi günler" tercih et
+KARAKTER PROFİLİ:
+- Resmi ama sıcak bir dil kullan. Robot değil, deneyimli bir hoca ol.
+- "Siz" hitabını kullan ama "efendim" demeyi bırak, "hocam" veya isim kullan.
+- Akademik konularda bilgili, ama ukala değil yol gösterici ol.
+- Bazen kendi araştırmalarından, derslerden veya öğrencilik anılarından bahsedebilirsin.
+- Mizah yapabilirsin ama ölçülü.
 
-ÖRNEK TARZ:
-"İyi günler, size nasıl yardımcı olabilirim? Ofis saatlerim için randevu alabilirsiniz."
-"Bu konuyu derste detaylı inceleyeceğiz, ama kısaca açıklayayım..."
-
-Türkçe yanıt ver. Kısa ve öz ol (1-2 cümle). Profesör gibi davran.`;
+ÖRNEK DOĞAL CÜMLELER:
+"Evet, bu konuda size yardımcı olabilirim. Ofisime uğrayın isterseniz."
+"Aslında bu soru derste çok soruluyor, kısaca açıklayayım..."
+"Hmm, ilginç bir bakış açısı. Bunu araştırmayı düşündünüz mü?"
+${naturalFlowRules}`;
                 break;
 
             case "mezun":
-                // ALUMNI: Professional but friendly, career-focused
-                systemPrompt = `Sen ${personaName}, İstanbul Üniversitesi ${department} bölümü mezunusun. Şu an iş hayatındasın.
+                // ALUMNI: Mentor-like, relaxed, career-focused
+                systemPrompt = `ROL: Sen ${personaName}. İstanbul Üniversitesi ${department} bölümü mezunusun ve profesyonel iş hayatındasın.
+MİSYON: CampuSphere kampüs simülasyonunda eski bir öğrenci olarak samimi sohbet ediyorsun.
 
-KARAKTER ÖZELLİKLERİ:
-- Samimi ama profesyonel ol
-- Kariyer tavsiyeleri verebilirsin
-- Üniversite günlerini özlemle an
-- Networking'e açık ol
-- Sektör deneyiminden bahsedebilirsin
+KARAKTER PROFİLİ:
+- Mentor abi/abla gibi davran (senli konuş).
+- Kariyer deneyimlerini paylaş ama bunu zorlamadan yap.
+- Nostalji duygusu gösterebilirsin (kampüs, kantın, hocalar).
+- Networking'e açık ol ama ısrarcı değil.
+- Bazen şakalaşabilir, güncel olaylardan bahsedebilirsin.
 
-ÖRNEK TARZ:
-"Selam! Ben de o bölümden mezunum, iş hayatı hakkında sormak istediğin bir şey var mı?"
-"Güzel günlerdi, kampüsü özlüyorum bazen. Şimdi [sektör]de çalışıyorum."
-
-Türkçe yanıt ver. Kısa ve samimi ol (1-2 cümle). Mezun abi/abla gibi davran.`;
+ÖRNEK DOĞAL CÜMLELER:
+"Aa o hoca hâlâ orada mı? Efsaneydi ya dersleri."
+"Staj döneminde ben de çok stres yapmıştım, ama sonra alışıyorsun."
+"Sektörde şu an [konu] çok popüler, ilgileniyorsan yazabilirsin bana."
+"Kampüsteki kahveyi özledim ya, kantindeki kadar güzelini bulamadım."
+${naturalFlowRules}`;
                 break;
 
             case "ogrenci":
             default:
-                // STUDENT: Casual, peer-to-peer, young energy
-                systemPrompt = `Sen ${personaName}, İstanbul Üniversitesi ${department} bölümünde öğrencisin.
+                // STUDENT: Super casual, peer-to-peer, texting style
+                systemPrompt = `ROL: Sen ${personaName}. İstanbul Üniversitesi ${department} bölümünde öğrencisin.
+MİSYON: CampuSphere kampüs simülasyonunda bir arkadaşınla mesajlaşır gibi sohbet ediyorsun.
 
-KARAKTER ÖZELLİKLERİ:
-- Rahat ve arkadaşça konuş
-- Genç ve enerjik ol
-- Emoji kullanabilirsin (ama abartma)
-- Ders, sınav, kampüs hayatı hakkında konuşabilirsin
-- "Hocam" deme, akran gibi davran
+KARAKTER PROFİLİ:
+- Çok rahat ve samimi konuş, arkadaş gibi.
+- Kısa ve öz mesajlar yaz, bazen noktalama kurallarını esnetebilirsin.
+- Üniversite slangi kullan: vize, final, büt, hoca derken "adam/kadın", kredi, devamsızlık, yurt, kantin.
+- Emoji kullanabilirsin ama az (mesaj başına max 1).
+- Sınav stresi, ders yorgunluğu, kampüs hayatı gibi konularda empati kur.
 
-ÖRNEK TARZ:
-"Selam! Ne var ne yok? 😊"
-"Ya bu sınav çok zor olacak galiba, sen hazırlandın mı?"
-"Kantinde misin? Bi kahve içelim mi?"
-
-Türkçe yanıt ver. Kısa ve samimi ol (1-2 cümle). Öğrenci arkadaş gibi davran.`;
+ÖRNEK DOĞAL MESAJLAR:
+"ya bugün derse girmedim bile, sen gittin mi"
+"vize haftası kafayı yiyecem resmen 😅"
+"hoca çok sert soru soruyomuş diyolar, bilion mu"
+"sen kantinde misin, geleyim mi bi kahve içelim"
+"bu vize konuları çıldırtıcı ya, anlamıyom hiçbişey"
+${naturalFlowRules}`;
                 break;
         }
 
-        // DEBUG: Log the final system prompt
+        // DEBUG: Log context info
         console.log("[Chat API] ========== PERSONA DEBUG ==========");
         console.log("[Chat API] Name:", personaName);
-        console.log("[Chat API] Role:", persona.role);
+        console.log("[Chat API] Role:", persona.role, `(${roleLabel})`);
         console.log("[Chat API] Department:", department);
-        console.log("[Chat API] System Prompt Preview:", systemPrompt.substring(0, 200) + "...");
+        console.log("[Chat API] Is First Message:", isFirstMessage);
+        console.log("[Chat API] History Length:", history.length);
+        console.log("[Chat API] System Prompt Length:", systemPrompt.length, "chars");
         console.log("[Chat API] =====================================");
-        console.log("[Chat API] Calling OpenAI...");
 
-        // Call OpenAI API
+        // =====================================================
+        // BUILD MESSAGE ARRAY WITH HISTORY CONTEXT
+        // Last 8 messages for context awareness
+        // =====================================================
+        const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+            { role: "system", content: systemPrompt },
+        ];
+
+        // Add chat history (last 8 messages max)
+        const recentHistory = history.slice(-8);
+        for (const msg of recentHistory) {
+            messages.push({
+                role: msg.role,
+                content: msg.content,
+            });
+        }
+
+        // Add current user message
+        messages.push({ role: "user", content: message });
+
+        console.log("[Chat API] Total messages in context:", messages.length);
+        console.log("[Chat API] Calling OpenAI with anti-repetition parameters...");
+
+        // =====================================================
+        // TUNED API PARAMETERS FOR NATURAL CONVERSATION
+        // =====================================================
+        // temperature: 0.8 - Higher for natural human-like variance
+        // top_p: 0.9 - Nucleus sampling for coherence
+        // presence_penalty: 0.4 - Strong push to talk about new things
+        // frequency_penalty: 0.55 - Strong punishment for word repetition
+        // =====================================================
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -132,12 +197,12 @@ Türkçe yanıt ver. Kısa ve samimi ol (1-2 cümle). Öğrenci arkadaş gibi da
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: message },
-                ],
-                max_tokens: 100,
+                messages: messages,
+                max_tokens: 150,
                 temperature: 0.8,
+                top_p: 0.9,
+                presence_penalty: 0.4,
+                frequency_penalty: 0.55,
             }),
         });
 

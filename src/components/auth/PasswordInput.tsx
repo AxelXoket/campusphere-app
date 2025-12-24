@@ -25,7 +25,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 {label && (
                     <label
                         htmlFor={inputId}
-                        className="block text-sm font-medium text-[var(--muted)]"
+                        className="block text-sm font-medium text-white"
                     >
                         {label}
                     </label>
@@ -46,7 +46,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                     <button
                         type="button"
                         onClick={() => setIsVisible(!isVisible)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[#9ca3af] hover:text-[#4B5563] transition-colors duration-200"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-white/50 hover:text-white transition-colors duration-200"
                         tabIndex={-1}
                         aria-label={isVisible ? "Şifreyi gizle" : "Şifreyi göster"}
                     >

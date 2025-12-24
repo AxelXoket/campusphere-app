@@ -115,6 +115,8 @@ export function ProgressiveRegistration({ onComplete, onSkip }: ProgressiveRegis
             {step === 1 ? (
                 <Step1Form
                     key="step1"
+                    role={role}
+                    setRole={setRole}
                     name={name}
                     setName={setName}
                     email={email}
@@ -153,6 +155,7 @@ export function ProgressiveRegistration({ onComplete, onSkip }: ProgressiveRegis
  * Step 1: Hızlı Kayıt
  */
 function Step1Form({
+    role, setRole,
     name, setName,
     email, setEmail,
     password, setPassword,
@@ -162,6 +165,7 @@ function Step1Form({
     isLoading,
     onSubmit,
 }: {
+    role: RoleType; setRole: (v: RoleType) => void;
     name: string; setName: (v: string) => void;
     email: string; setEmail: (v: string) => void;
     password: string; setPassword: (v: string) => void;
@@ -182,8 +186,16 @@ function Step1Form({
         >
             {/* Progress Indicator */}
             <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-8 h-1 rounded-full bg-[var(--bosphorus-emerald)]" />
-                <div className="w-8 h-1 rounded-full bg-gray-200" />
+                <div className="w-8 h-1 rounded-full bg-indigo-500" />
+                <div className="w-8 h-1 rounded-full bg-white/20" />
+            </div>
+
+            {/* Role Selection - Moved from Step 2 */}
+            <div className="space-y-3">
+                <label className="block text-sm font-medium text-white">
+                    Hesap Türü
+                </label>
+                <SegmentedControl value={role} onChange={setRole} />
             </div>
 
             {/* Name Input */}
@@ -197,7 +209,7 @@ function Step1Form({
                     onBlur={handleNameBlur}
                     required
                 />
-                <p className="text-xs text-[var(--muted)] opacity-70 pl-0.5">
+                <p className="text-xs text-white/60 pl-0.5">
                     Kimlik belgenizde yer alan ismi giriniz.
                 </p>
             </div>
@@ -297,30 +309,22 @@ function Step2Form({
         >
             {/* Progress Indicator */}
             <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-8 h-1 rounded-full bg-[var(--bosphorus-emerald)]" />
-                <div className="w-8 h-1 rounded-full bg-[var(--bosphorus-emerald)]" />
+                <div className="w-8 h-1 rounded-full bg-indigo-500" />
+                <div className="w-8 h-1 rounded-full bg-indigo-500" />
             </div>
 
             {/* Back Button */}
             <button
                 type="button"
                 onClick={onBack}
-                className="text-sm text-[#9ca3af] hover:text-[#4B5563] transition-colors duration-200"
+                className="text-sm text-white/60 hover:text-white transition-colors duration-200"
             >
                 ← Geri
             </button>
 
-            {/* Role Selection */}
-            <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
-                    Hesap Türü
-                </label>
-                <SegmentedControl value={role} onChange={setRole} />
-            </div>
-
             {/* Faculty Dropdown */}
             <div className="space-y-1">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Fakülte
                 </label>
                 <select
@@ -329,12 +333,12 @@ function Step2Form({
                         setFaculty(e.target.value);
                         setDepartment(""); // Reset department when faculty changes
                     }}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-[#1a1a1a] text-sm cursor-pointer transition-all duration-200 focus:border-[var(--bosphorus-emerald)] focus:ring-2 focus:ring-[var(--bosphorus-emerald)]/20 focus:outline-none hover:border-[var(--bosphorus-emerald)]/50"
+                    className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm text-white text-sm cursor-pointer transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none hover:border-white/40"
                     required
                 >
-                    <option value="">Fakülte seçiniz...</option>
+                    <option value="" className="bg-gray-900 text-white">Fakülte seçiniz...</option>
                     {faculties.map((f) => (
-                        <option key={f} value={f}>
+                        <option key={f} value={f} className="bg-gray-900 text-white">
                             {f}
                         </option>
                     ))}
@@ -343,7 +347,7 @@ function Step2Form({
 
             {/* Department Dropdown */}
             <div className="space-y-1 relative">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     Bölüm
                 </label>
                 <div className="relative">
@@ -351,24 +355,24 @@ function Step2Form({
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
                         className={`w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200 focus:outline-none ${!faculty
-                                ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "border-gray-200 bg-white/80 backdrop-blur-sm text-[#1a1a1a] cursor-pointer hover:border-[var(--bosphorus-emerald)]/50 focus:border-[var(--bosphorus-emerald)] focus:ring-2 focus:ring-[var(--bosphorus-emerald)]/20"
+                            ? "border-white/10 bg-white/5 text-white/40 cursor-not-allowed"
+                            : "border-white/20 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:border-white/40 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
                             }`}
                         disabled={!faculty}
                         required
                     >
-                        <option value="">
+                        <option value="" className="bg-gray-900 text-white">
                             {!faculty ? "Önce fakülte seçiniz..." : "Bölüm seçiniz..."}
                         </option>
                         {availableDepartments.map((d) => (
-                            <option key={d} value={d}>
+                            <option key={d} value={d} className="bg-gray-900 text-white">
                                 {d}
                             </option>
                         ))}
                     </select>
                     {/* Disabled state tooltip */}
                     {!faculty && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/40">
                             ⚠
                         </div>
                     )}
@@ -377,7 +381,7 @@ function Step2Form({
 
             {/* File Upload */}
             <div className="space-y-3">
-                <label className="block text-sm font-medium text-[var(--muted)]">
+                <label className="block text-sm font-medium text-white">
                     {documentLabels[role]}
                 </label>
                 <FileUpload onFileSelect={setFile} />
@@ -403,17 +407,6 @@ function Step2Form({
                     "Doğrulamayı Tamamla"
                 )}
             </motion.button>
-
-            {/* Skip Link */}
-            <div className="text-center pt-2">
-                <button
-                    type="button"
-                    onClick={onSkip}
-                    className="text-sm text-[#6B7280] hover:text-[#4B5563] hover:underline transition-colors duration-200"
-                >
-                    Şimdilik haritayı gözlemle (Kısıtlı erişim)
-                </button>
-            </div>
         </motion.form>
     );
 }
