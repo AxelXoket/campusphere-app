@@ -4,7 +4,6 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { MapView } from "@/components/map";
 import {
     SearchBar,
-    ProfileButton,
     ProfileDrawer,
     ToolDock,
     LeftPanel,
@@ -14,8 +13,10 @@ import {
     LayersOverlay,
     VerificationOverlay,
     CalendarDropdown,
-    AnnouncementsPanel
+    AnnouncementsPanel,
+    UserActionDock
 } from "@/components/hud";
+import { CreateEventModal } from "@/components/hud/CreateEventFAB";
 import { mockEvents, MockEvent } from "@/data/mockEvents";
 import { mockUsers, MockUser, getVisibleUsers, CurrentUserContext } from "@/data/mockUsers";
 import { createOrGetDirectMessage } from "@/data/mockMessages";
@@ -81,6 +82,9 @@ export default function MapPage() {
     const [isVerified, setIsVerified] = useState(true);
     const [verificationOverlayOpen, setVerificationOverlayOpen] = useState(false);
     const [restrictedFeature, setRestrictedFeature] = useState<string | undefined>();
+
+    // Create Event Modal
+    const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
 
     // Load verification status from localStorage on mount
     useEffect(() => {
@@ -169,6 +173,7 @@ export default function MapPage() {
                 onEventClick={(event) => {
                     setSelectedEvent(event);
                     setIsEventSheetOpen(true);
+                    setIsCalendarOpen(false); // Close calendar when event is clicked
                 }}
             />
 
@@ -222,15 +227,15 @@ export default function MapPage() {
                 </div>
             )}
 
-            <ProfileButton
+            <UserActionDock
                 avatar={currentUser.avatar}
-                onClick={() => setIsProfileOpen(true)}
-                isGhostMode={isGhostMode}
+                onProfileClick={() => setIsProfileOpen(true)}
             />
 
             <ToolDock
                 onFilterClick={() => setIsFilterOpen(true)}
                 onLayersClick={() => setIsLayersOpen(true)}
+                onCreateEventClick={() => setIsCreateEventOpen(true)}
             />
 
             {/* Profile Drawer with detailed info and Ghost Mode control */}
@@ -309,6 +314,12 @@ export default function MapPage() {
                 isOpen={verificationOverlayOpen}
                 onClose={() => setVerificationOverlayOpen(false)}
                 featureName={restrictedFeature}
+            />
+
+            {/* Create Event Modal - Triggered from ToolDock for privileged users */}
+            <CreateEventModal
+                isOpen={isCreateEventOpen}
+                onClose={() => setIsCreateEventOpen(false)}
             />
         </main>
     );

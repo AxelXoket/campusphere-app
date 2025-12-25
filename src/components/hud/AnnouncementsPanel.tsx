@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Calendar, Briefcase, GraduationCap } from "lucide-react";
+import { X, Briefcase, GraduationCap } from "lucide-react";
 
 interface AnnouncementsPanelProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-type TabType = "etkinlik" | "staj" | "is";
+type TabType = "staj" | "is";
 
 interface Announcement {
     id: string;
@@ -19,36 +19,29 @@ interface Announcement {
     type: TabType;
 }
 
-// Mock announcements data - expanded for taller panel
+// Mock announcements data - Staj and İş only
 const mockAnnouncements: Announcement[] = [
-    // Etkinlik (Events)
-    { id: "1", title: "Yapay Zeka Konferansı", subtitle: "Google Türkiye", date: "25 Aralık 2025", type: "etkinlik" },
-    { id: "2", title: "Kariyer Günleri 2025", subtitle: "İÜ Kariyer Merkezi", date: "28 Aralık 2025", type: "etkinlik" },
-    { id: "3", title: "Blockchain Workshop", subtitle: "Binance Academy", date: "2 Ocak 2026", type: "etkinlik" },
-    { id: "4", title: "Startup Pitch Night", subtitle: "İTÜ ARI Teknokent", date: "5 Ocak 2026", type: "etkinlik" },
-    { id: "5", title: "Web3 Hackathon", subtitle: "Ethereum Foundation", date: "10 Ocak 2026", type: "etkinlik" },
     // Staj (Internships)
-    { id: "6", title: "Yazılım Geliştirici Stajyeri", subtitle: "Microsoft Türkiye", date: "Son Başvuru: 15 Ocak", type: "staj" },
-    { id: "7", title: "Data Science Intern", subtitle: "Trendyol", date: "Son Başvuru: 20 Ocak", type: "staj" },
-    { id: "8", title: "UX Design Stajı", subtitle: "Getir", date: "Son Başvuru: 25 Ocak", type: "staj" },
-    { id: "9", title: "Backend Developer Intern", subtitle: "N11", date: "Son Başvuru: 30 Ocak", type: "staj" },
-    { id: "10", title: "Mobile App Stajyeri", subtitle: "Yemeksepeti", date: "Son Başvuru: 5 Şubat", type: "staj" },
+    { id: "1", title: "Yazılım Geliştirici Stajyeri", subtitle: "Microsoft Türkiye", date: "Son Başvuru: 15 Ocak", type: "staj" },
+    { id: "2", title: "Data Science Intern", subtitle: "Trendyol", date: "Son Başvuru: 20 Ocak", type: "staj" },
+    { id: "3", title: "UX Design Stajı", subtitle: "Getir", date: "Son Başvuru: 25 Ocak", type: "staj" },
+    { id: "4", title: "Backend Developer Intern", subtitle: "N11", date: "Son Başvuru: 30 Ocak", type: "staj" },
+    { id: "5", title: "Mobile App Stajyeri", subtitle: "Yemeksepeti", date: "Son Başvuru: 5 Şubat", type: "staj" },
     // İş (Jobs)
-    { id: "11", title: "Junior Full Stack Developer", subtitle: "Peak Games", date: "Tam Zamanlı", type: "is" },
-    { id: "12", title: "DevOps Engineer", subtitle: "Insider", date: "Tam Zamanlı", type: "is" },
-    { id: "13", title: "Product Manager", subtitle: "Dream Games", date: "Tam Zamanlı", type: "is" },
-    { id: "14", title: "Senior Frontend Developer", subtitle: "Hepsiburada", date: "Tam Zamanlı", type: "is" },
-    { id: "15", title: "Machine Learning Engineer", subtitle: "Turkcell", date: "Tam Zamanlı", type: "is" },
+    { id: "6", title: "Junior Full Stack Developer", subtitle: "Peak Games", date: "Tam Zamanlı", type: "is" },
+    { id: "7", title: "DevOps Engineer", subtitle: "Insider", date: "Tam Zamanlı", type: "is" },
+    { id: "8", title: "Product Manager", subtitle: "Dream Games", date: "Tam Zamanlı", type: "is" },
+    { id: "9", title: "Senior Frontend Developer", subtitle: "Hepsiburada", date: "Tam Zamanlı", type: "is" },
+    { id: "10", title: "Machine Learning Engineer", subtitle: "Turkcell", date: "Tam Zamanlı", type: "is" },
 ];
 
-const tabs: { key: TabType; label: string; icon: typeof Calendar }[] = [
-    { key: "etkinlik", label: "Etkinlik", icon: Calendar },
+const tabs: { key: TabType; label: string; icon: typeof GraduationCap }[] = [
     { key: "staj", label: "Staj", icon: GraduationCap },
-    { key: "is", label: "İş", icon: Briefcase },
+    { key: "is", label: "İş İlanları", icon: Briefcase },
 ];
 
 export function AnnouncementsPanel({ isOpen, onClose }: AnnouncementsPanelProps) {
-    const [activeTab, setActiveTab] = useState<TabType>("etkinlik");
+    const [activeTab, setActiveTab] = useState<TabType>("staj");
 
     const filteredAnnouncements = mockAnnouncements.filter(a => a.type === activeTab);
 
@@ -91,7 +84,7 @@ export function AnnouncementsPanel({ isOpen, onClose }: AnnouncementsPanelProps)
                                 </button>
                             </div>
 
-                            {/* Triple Toggle - Higher z-index than content */}
+                            {/* Dual Toggle - Staj & İş only */}
                             <div className="relative z-10 px-4 py-3 bg-black/60">
                                 <div className="flex bg-white/5 rounded-xl p-1">
                                     {tabs.map((tab) => {
@@ -102,7 +95,7 @@ export function AnnouncementsPanel({ isOpen, onClose }: AnnouncementsPanelProps)
                                                 key={tab.key}
                                                 onClick={() => setActiveTab(tab.key)}
                                                 className={`
-                          flex-1 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg transition-all duration-200
+                          flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg transition-all duration-200
                           ${isActive
                                                         ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
                                                         : "text-white/60 hover:text-white hover:bg-white/5"
@@ -111,7 +104,7 @@ export function AnnouncementsPanel({ isOpen, onClose }: AnnouncementsPanelProps)
                                             >
                                                 <Icon className="w-4 h-4" />
                                                 <span
-                                                    className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
+                                                    className={`text-sm font-medium ${isActive ? "font-semibold" : ""}`}
                                                     style={isActive ? { fontFamily: "var(--font-heading)" } : undefined}
                                                 >
                                                     {tab.label}

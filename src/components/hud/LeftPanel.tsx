@@ -92,6 +92,8 @@ export function LeftPanel({
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
+                        whileHover={{ scale: 1.15, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => {
                             if (externalOnOpen) {
                                 externalOnOpen();
@@ -258,8 +260,8 @@ function EventCard({
     return (
         <motion.button
             onClick={onClick}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.03, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+            whileTap={{ scale: 0.97 }}
             className="w-full text-left p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 hover:border-[var(--warm-gold)]/50 transition-colors"
         >
             {event.imageUrl && (

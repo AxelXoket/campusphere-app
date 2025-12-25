@@ -56,12 +56,12 @@ export function FileUpload({ onFileSelect, accept = ".pdf,.jpg,.jpeg,.png" }: Fi
         <div className="space-y-2">
             <label
                 className={cn(
-                    "relative block rounded-xl overflow-hidden cursor-pointer transition-colors",
+                    "relative block rounded-xl overflow-hidden cursor-pointer transition-all duration-300",
                     uploadedFile
-                        ? "bg-[rgba(16,185,129,0.05)]"
+                        ? "bg-emerald-500/10 border border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                         : isDragActive
-                            ? "bg-[rgba(0,77,64,0.05)]"
-                            : "bg-transparent hover:bg-[rgba(0,77,64,0.02)]"
+                            ? "bg-[rgba(0,77,64,0.08)]"
+                            : "bg-transparent hover:bg-[rgba(0,77,64,0.03)]"
                 )}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -77,7 +77,7 @@ export function FileUpload({ onFileSelect, accept = ".pdf,.jpg,.jpeg,.png" }: Fi
                 />
 
                 {/* Content */}
-                <div className="flex flex-col items-center justify-center gap-3 min-h-[140px] p-8">
+                <div className="flex flex-col items-center justify-center gap-3 min-h-[160px] py-8 px-6">
                     <input
                         type="file"
                         className="hidden"
@@ -93,12 +93,12 @@ export function FileUpload({ onFileSelect, accept = ".pdf,.jpg,.jpeg,.png" }: Fi
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0, opacity: 0 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                                className="flex flex-col items-center gap-2"
+                                className="flex flex-col items-center gap-3"
                             >
-                                <div className="w-12 h-12 rounded-full bg-[var(--success)] flex items-center justify-center">
-                                    <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                    <Check className="w-7 h-7 text-white" strokeWidth={3} />
                                 </div>
-                                <p className="text-sm text-[var(--success)] font-medium">
+                                <p className="text-sm text-emerald-200 font-medium max-w-[200px] truncate">
                                     {uploadedFile.name}
                                 </p>
                             </motion.div>
@@ -134,7 +134,7 @@ export function FileUpload({ onFileSelect, accept = ".pdf,.jpg,.jpeg,.png" }: Fi
             </label>
 
             {/* Tooltip for approval process */}
-            <p className="text-xs text-[var(--muted)] text-center italic">
+            <p className="text-xs text-white/40 text-center italic mt-4">
                 Onay süreci 24-48 saattir.
             </p>
         </div>
@@ -172,8 +172,9 @@ function MarchingAntsBorder({
                 ry="11"
                 fill="none"
                 strokeWidth="2"
-                stroke={isSuccess ? "var(--success)" : isAnimating ? "var(--bosphorus-emerald)" : "var(--input-border)"}
-                strokeDasharray={isSuccess ? "none" : dashArray}
+                stroke={isSuccess ? "#10b981" : isAnimating ? "var(--bosphorus-emerald)" : "var(--input-border)"}
+                strokeDasharray={isSuccess ? undefined : dashArray}
+                strokeOpacity={isSuccess ? 1 : undefined}
                 className={cn(
                     "transition-[stroke] duration-200",
                     isAnimating && !isSuccess && "animate-marching-ants"
