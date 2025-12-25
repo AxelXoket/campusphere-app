@@ -93,8 +93,9 @@ export function SearchBar({ onCalendarClick, onAnnouncementsClick }: SearchBarPr
                 {/* Calendar Icon (Left) - Only render interactive button after mount */}
                 {mounted ? (
                     <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
+                        animate={{ scale: 1 }}
+                        whileHover={{ scale: 1.15, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={onCalendarClick}
                         className="w-11 h-11 rounded-full backdrop-blur-md bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
                         aria-label="Takvimi aç"
@@ -124,8 +125,9 @@ export function SearchBar({ onCalendarClick, onAnnouncementsClick }: SearchBarPr
                 {/* Announcements Icon (Right) */}
                 {mounted ? (
                     <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
+                        animate={{ scale: 1 }}
+                        whileHover={{ scale: 1.15, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={onAnnouncementsClick}
                         className="w-11 h-11 rounded-full backdrop-blur-md bg-black/60 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
                         aria-label="Duyuruları aç"

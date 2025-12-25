@@ -120,7 +120,7 @@ export function EventBottomSheet({
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/50 z-40"
+                        className="fixed inset-0 bg-black/50 z-[60]"
                     />
 
                     {/* Centered Floating Modal */}
@@ -133,7 +133,7 @@ export function EventBottomSheet({
                             damping: 30,
                             stiffness: 400,
                         }}
-                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-xl"
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] w-[calc(100%-2rem)] max-w-xl"
                     >
                         {/* Panel with Dark Glassmorphism */}
                         <div className="relative backdrop-blur-xl bg-black/90 border border-white/10 rounded-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl shadow-black/60">

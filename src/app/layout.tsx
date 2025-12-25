@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Serif_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { MockAuthProvider } from "@/lib/MockAuthContext";
 
 // Heading font - DM Serif Display for the historic IU gate feel
 const dmSerifDisplay = DM_Serif_Display({
@@ -33,10 +34,13 @@ export default function RootLayout({
       <body
         className={`${dmSerifDisplay.variable} ${inter.variable} antialiased`}
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <MockAuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </MockAuthProvider>
       </body>
     </html>
   );
 }
+

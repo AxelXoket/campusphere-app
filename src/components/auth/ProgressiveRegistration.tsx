@@ -6,7 +6,9 @@ import { UnderlineInput } from "./UnderlineInput";
 import { PasswordInput } from "./PasswordInput";
 import { SegmentedControl, RoleType } from "./SegmentedControl";
 import { FileUpload } from "./FileUpload";
+import { SearchableCombobox } from "./SearchableCombobox";
 import { faculties, getDepartments } from "@/data/faculties";
+import { CheckCircle } from "lucide-react";
 
 type RegistrationStep = 1 | 2;
 
@@ -45,6 +47,7 @@ export function ProgressiveRegistration({ onComplete, onSkip }: ProgressiveRegis
     const [faculty, setFaculty] = useState("");
     const [department, setDepartment] = useState("");
     const [file, setFile] = useState<File | undefined>();
+    const [showVerificationMessage, setShowVerificationMessage] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -80,23 +83,28 @@ export function ProgressiveRegistration({ onComplete, onSkip }: ProgressiveRegis
         setStep(2);
     };
 
-    // Handle Step 2 submission (verified)
+    // Handle Step 2 submission - MOCK (no backend)
     const handleStep2Submit = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+
+        // Simulate processing
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        onComplete({
-            name: capitalizeWords(name),
-            email,
-            password,
-            role,
-            faculty,
-            department,
-            file,
-            isVerified: true,
-        });
+        // Show verification message instead of calling Supabase
+        setShowVerificationMessage(true);
         setIsLoading(false);
+
+        // Clear form after showing message
+        setTimeout(() => {
+            setName("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+            setFaculty("");
+            setDepartment("");
+            setFile(undefined);
+        }, 500);
     };
 
     // Handle skip (unverified)
@@ -109,6 +117,38 @@ export function ProgressiveRegistration({ onComplete, onSkip }: ProgressiveRegis
         });
         onSkip();
     };
+
+    // Show verification message modal - takes full card space
+    if (showVerificationMessage) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-12 min-h-[300px]"
+            >
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 }}
+                    className="w-24 h-24 mb-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                >
+                    <CheckCircle className="w-12 h-12 text-white" />
+                </motion.div>
+
+                <h3 className="text-2xl font-heading text-white mb-4">
+                    Kayıt Başarılı!
+                </h3>
+
+                <p className="text-white/70 text-sm leading-relaxed text-center max-w-[300px] mb-4">
+                    Doğrulama işleminiz sürüyor, sisteme erişmek için hesabınızın doğrulanmasını bekleyiniz.
+                </p>
+
+                <p className="text-white/40 text-xs">
+                    Bu işlem 24-48 saat sürebilir.
+                </p>
+            </motion.div>
+        );
+    }
 
     return (
         <AnimatePresence mode="wait">
@@ -323,61 +363,28 @@ function Step2Form({
             </button>
 
             {/* Faculty Dropdown */}
-            <div className="space-y-1">
-                <label className="block text-sm font-medium text-white">
-                    Fakülte
-                </label>
-                <select
-                    value={faculty}
-                    onChange={(e) => {
-                        setFaculty(e.target.value);
-                        setDepartment(""); // Reset department when faculty changes
-                    }}
-                    className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm text-white text-sm cursor-pointer transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none hover:border-white/40"
-                    required
-                >
-                    <option value="" className="bg-gray-900 text-white">Fakülte seçiniz...</option>
-                    {faculties.map((f) => (
-                        <option key={f} value={f} className="bg-gray-900 text-white">
-                            {f}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <SearchableCombobox
+                label="Fakülte"
+                options={faculties}
+                value={faculty}
+                onChange={(value) => {
+                    setFaculty(value);
+                    setDepartment("");
+                }}
+                placeholder="Fakülte seçiniz..."
+                required
+            />
 
             {/* Department Dropdown */}
-            <div className="space-y-1 relative">
-                <label className="block text-sm font-medium text-white">
-                    Bölüm
-                </label>
-                <div className="relative">
-                    <select
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        className={`w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200 focus:outline-none ${!faculty
-                            ? "border-white/10 bg-white/5 text-white/40 cursor-not-allowed"
-                            : "border-white/20 bg-white/10 backdrop-blur-sm text-white cursor-pointer hover:border-white/40 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
-                            }`}
-                        disabled={!faculty}
-                        required
-                    >
-                        <option value="" className="bg-gray-900 text-white">
-                            {!faculty ? "Önce fakülte seçiniz..." : "Bölüm seçiniz..."}
-                        </option>
-                        {availableDepartments.map((d) => (
-                            <option key={d} value={d} className="bg-gray-900 text-white">
-                                {d}
-                            </option>
-                        ))}
-                    </select>
-                    {/* Disabled state tooltip */}
-                    {!faculty && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/40">
-                            ⚠
-                        </div>
-                    )}
-                </div>
-            </div>
+            <SearchableCombobox
+                label="Bölüm"
+                options={availableDepartments}
+                value={department}
+                onChange={setDepartment}
+                placeholder={!faculty ? "Önce fakülte seçiniz..." : "Bölüm seçiniz..."}
+                disabled={!faculty}
+                required
+            />
 
             {/* File Upload */}
             <div className="space-y-3">
@@ -404,7 +411,7 @@ function Step2Form({
                         Doğrulanıyor...
                     </span>
                 ) : (
-                    "Doğrulamayı Tamamla"
+                    "Doğrulamayı Başlat"
                 )}
             </motion.button>
         </motion.form>

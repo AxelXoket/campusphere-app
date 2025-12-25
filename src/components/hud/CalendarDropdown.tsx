@@ -116,8 +116,8 @@ function EventPopover({
             ref={popoverRef}
             initial={{ opacity: 0, y: -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -5, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.05 }}
             style={{
                 position: "fixed",
                 left: Math.min(position.x, window.innerWidth - 320),
@@ -147,8 +147,7 @@ function EventPopover({
                         transition={{ delay: idx * 0.05 }}
                         onClick={(e) => {
                             e.stopPropagation();
-                            onEventClick(event);
-                            onClose();
+                            onEventClick(event); // Parent handles all cleanup now
                         }}
                         className="w-full px-5 py-4 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-0 group"
                     >
@@ -473,7 +472,7 @@ export function CalendarDropdown({ isOpen, onClose, onEventClick }: CalendarDrop
                                         animate={{ x: 0, opacity: 1 }}
                                         exit={{ x: slideDirection > 0 ? -50 : 50, opacity: 0 }}
                                         transition={{ type: "tween", ease: "easeInOut", duration: 0.2 }}
-                                        className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide"
+                                        className="flex items-center gap-3 overflow-x-auto pt-4 pb-2 scrollbar-hide"
                                     >
                                         {weeks.map((weekStart, idx) => {
                                             const weekEnd = new Date(weekStart);
@@ -498,7 +497,7 @@ export function CalendarDropdown({ isOpen, onClose, onEventClick }: CalendarDrop
                                                         }`}
                                                 >
                                                     {isThisWeek && !isSelected && (
-                                                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-[var(--bosphorus-emerald)] px-2 py-0.5 rounded-full shadow-md z-10">
+                                                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-white bg-[var(--bosphorus-emerald)] px-2 py-0.5 rounded-full shadow-lg z-20">
                                                             Bu Hafta
                                                         </span>
                                                     )}
@@ -605,17 +604,20 @@ export function CalendarDropdown({ isOpen, onClose, onEventClick }: CalendarDrop
                         </div>
                     </motion.div>
 
-                    {/* Event Popover - with ultra-high z-index */}
-                    <AnimatePresence>
-                        {selectedDay && (
-                            <EventPopover
-                                day={selectedDay}
-                                position={popoverPosition}
-                                onEventClick={onEventClick}
-                                onClose={closePopover}
-                            />
-                        )}
-                    </AnimatePresence>
+                    {/* Event Popover - NO AnimatePresence for instant close */}
+                    {selectedDay && (
+                        <EventPopover
+                            day={selectedDay}
+                            position={popoverPosition}
+                            onEventClick={(event) => {
+                                // CLEAN SWEEP: Clear popover FIRST, then close calendar, then open event
+                                setSelectedDay(null); // 1. Kill popover state immediately
+                                onClose(); // 2. Close the calendar dropdown
+                                onEventClick(event); // 3. Open event details
+                            }}
+                            onClose={closePopover}
+                        />
+                    )}
                 </>
             )}
         </AnimatePresence>

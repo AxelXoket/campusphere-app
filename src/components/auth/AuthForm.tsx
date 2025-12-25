@@ -2,11 +2,13 @@
 
 import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useRouter } from "next/navigation";
 import { SegmentedControl, RoleType } from "./SegmentedControl";
 import { UnderlineInput } from "./UnderlineInput";
 import { PasswordInput } from "./PasswordInput";
 import { Checkbox } from "./Checkbox";
 import { FileUpload } from "./FileUpload";
+import { useMockAuth, DEMO_EMAILS } from "@/lib/MockAuthContext";
 
 type AuthView = "login" | "register";
 
@@ -52,7 +54,7 @@ export function AuthForm({ onLogin, onRegister, onViewChange }: AuthFormProps) {
 
 /**
  * Login View - Giriş Yap
- * Role selection, Email, Password (no file upload)
+ * Mock auth with hardcoded demo emails
  */
 function LoginView({
     onSubmit,
@@ -61,36 +63,57 @@ function LoginView({
     onSubmit?: (data: { role: RoleType; email: string; password: string }) => void;
     onSwitchToRegister: () => void;
 }) {
-    const [role, setRole] = useState<RoleType>("ogrenci");
+    const router = useRouter();
+    const { login } = useMockAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        onSubmit?.({ role, email, password });
+        setError(null);
+
+        // Simulate loading
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const result = login(email);
+
+        if (result.success) {
+            onSubmit?.({ role: "ogrenci", email, password });
+            router.push("/map");
+        } else {
+            setError(result.error || "Giriş başarısız");
+        }
+
         setIsLoading(false);
     };
 
     return (
         <motion.form
             onSubmit={handleSubmit}
-            className="space-y-8"
+            className="space-y-6"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
         >
-            {/* Role Selection */}
-            <div className="space-y-3">
-                <label className="block text-sm font-medium text-white">
-                    Hesap Türü
-                </label>
-                <SegmentedControl value={role} onChange={setRole} />
+            {/* Demo Login Hint */}
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <p className="text-xs text-emerald-400 text-center">
+                    Demo: {DEMO_EMAILS.join(" / ")}
+                </p>
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                    <p className="text-xs text-red-400 text-center">{error}</p>
+                </div>
+            )}
 
             {/* Email Input */}
             <UnderlineInput

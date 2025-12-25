@@ -85,8 +85,8 @@ export default function HomePage() {
               <button
                 onClick={() => setMode("login")}
                 className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${mode === "login"
-                    ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                  ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
               >
                 Giriş Yap
@@ -94,28 +94,26 @@ export default function HomePage() {
               <button
                 onClick={() => setMode("register")}
                 className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${mode === "register"
-                    ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                  ? "bg-[var(--bosphorus-emerald)] text-white shadow-lg"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
               >
                 Kayıt Ol
               </button>
             </div>
 
-            {/* Dynamic Heading - White for dark bg */}
-            <AnimatePresence mode="wait">
+            {/* Dynamic Heading - Only for login */}
+            {mode === "login" && (
               <motion.h2
-                key={mode}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.2 }}
                 className="text-2xl text-center text-white mb-6"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                {mode === "login" ? "Hoş Geldiniz" : "Hızlı Kayıt"}
+                Hoş Geldiniz
               </motion.h2>
-            </AnimatePresence>
+            )}
 
             {/* Form Content */}
             <AnimatePresence mode="wait">

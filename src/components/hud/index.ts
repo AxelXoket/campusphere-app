@@ -11,3 +11,4 @@ export { LayersOverlay } from "./LayersOverlay";
 export { VerificationOverlay } from "./VerificationOverlay";
 export { CalendarDropdown } from "./CalendarDropdown";
 export { AnnouncementsPanel } from "./AnnouncementsPanel";
+export { UserActionDock } from "./UserActionDock";
